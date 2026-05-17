@@ -1,215 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RAG Simulator</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Inter, Arial, sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 24px;
-    }
-    .container {
-      max-width: 1200px;
-      margin: auto;
-    }
-    h1 {
-      font-size: 32px;
-      margin-bottom: 8px;
-    }
-    .subtitle {
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
-    .pipeline {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
-      margin-bottom: 32px;
-    }
-    .step {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 16px;
-      cursor: pointer;
-      transition: all 0.25s;
-      min-height: 130px;
-    }
-    .step:hover, .step.active {
-      transform: translateY(-2px);
-      border-color: #38bdf8;
-      box-shadow: 0 10px 30px rgba(56,189,248,0.12);
-    }
-    .step h3 {
-      font-size: 14px;
-      margin-bottom: 8px;
-      color: #7dd3fc;
-    }
-    .step p {
-      font-size: 13px;
-      color: #cbd5e1;
-      line-height: 1.5;
-    }
-    .panel {
-      background: #111827;
-      border-radius: 20px;
-      border: 1px solid #334155;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-    textarea, input {
-      width: 100%;
-      background: #0f172a;
-      color: white;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 8px;
-      margin-bottom: 16px;
-    }
-    button {
-      background: #0ea5e9;
-      color: white;
-      border: none;
-      padding: 12px 18px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    button:hover {
-      background: #0284c7;
-    }
-    .output {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 12px;
-      background: #0f172a;
-      border: 1px solid #334155;
-      min-height: 120px;
-      white-space: pre-wrap;
-      line-height: 1.6;
-    }
-    .badge {
-      display: inline-block;
-      background: #1e40af;
-      color: #dbeafe;
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      margin-bottom: 12px;
-    }
-    @media (max-width: 1000px) {
-      .pipeline { grid-template-columns: repeat(2, 1fr); }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Advanced RAG Simulator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,Arial,sans-serif;background:#0f172a;color:#e2e8f0;padding:24px}
+.container{max-width:1400px;margin:auto}
+h1{font-size:36px;margin-bottom:8px}
+.subtitle{color:#94a3b8;margin-bottom:24px}
+.pipeline{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px}
+.step{background:#1e293b;padding:16px;border-radius:16px;border:1px solid #334155;cursor:pointer}
+.step.active{border-color:#38bdf8;box-shadow:0 0 20px rgba(56,189,248,.2)}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.panel{background:#111827;border:1px solid #334155;padding:20px;border-radius:20px}
+textarea,input{width:100%;background:#0f172a;color:white;border:1px solid #334155;border-radius:12px;padding:12px;margin:8px 0 16px}
+button{background:#0ea5e9;color:white;border:none;padding:12px 20px;border-radius:12px;cursor:pointer;font-weight:600}
+.output{margin-top:16px;padding:16px;background:#0f172a;border-radius:12px;border:1px solid #334155;min-height:320px;white-space:pre-wrap;line-height:1.5;font-size:14px}
+.controls label{display:block;margin:10px 0 4px;color:#7dd3fc}
+canvas{background:#0f172a;border-radius:16px;border:1px solid #334155;width:100%;height:300px}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>RAG Simulator</h1>
-    <p class="subtitle">Learn retrieval augmented generation step-by-step with your own documents.</p>
+<div class="container">
+<h1>Advanced RAG Lab</h1>
+<p class="subtitle">Experiment with chunking, overlap, embeddings, retrieval and prompt augmentation.</p>
 
-    <div class="pipeline" id="pipeline"></div>
+<div class="pipeline" id="pipeline"></div>
 
-    <div class="panel">
-      <div class="badge">Knowledge Base</div>
-      <textarea id="docs" rows="6">Leadership deck Q1 focused on revenue growth and hiring.
-Product roadmap includes warehouse automation and AI forecasting.
-Customer research document talks about NPS drop in deliveries.
-Purchase strategy includes vendor rationalisation and inventory optimization.</textarea>
+<div class="grid">
+<div class="panel">
+<label>Knowledge Base</label>
+<textarea id="docs" rows="8">Leadership deck Q1 focused on revenue growth and hiring. Product roadmap includes warehouse automation and AI forecasting. Customer research document talks about NPS drop in deliveries. Purchase strategy includes vendor rationalisation and inventory optimization. Supply chain team wants lower working capital while maintaining fill rate. Demand planning models are being rebuilt for seasonal spikes.</textarea>
 
-      <div class="badge">User Query</div>
-      <input id="query" value="Show me leadership related documents" />
+<label>User Query</label>
+<input id="query" value="Show me warehouse and supply chain related insights" />
 
-      <button onclick="runRAG()">Run Simulation</button>
+<div class="controls">
+<label>Chunk Size: <span id="chunkValue">12</span> words</label>
+<input type="range" id="chunkSize" min="5" max="25" value="12" />
 
-      <div class="output" id="output">Simulation output will appear here...</div>
-    </div>
-  </div>
+<label>Overlap: <span id="overlapValue">3</span> words</label>
+<input type="range" id="overlap" min="0" max="8" value="3" />
 
-  <script>
-    const steps = [
-      { title: '1. Documents', desc: 'Raw docs like PDFs, Notion, Drive files.' },
-      { title: '2. Chunking', desc: 'Break large docs into smaller chunks.' },
-      { title: '3. Embeddings', desc: 'Convert chunks into vectors.' },
-      { title: '4. Retrieval', desc: 'Find semantically similar chunks.' },
-      { title: '5. Augmentation', desc: 'Attach relevant context to prompt.' },
-      { title: '6. Generation', desc: 'LLM generates final answer.' }
-    ];
+<label>Top K Retrieval: <span id="topkValue">2</span></label>
+<input type="range" id="topk" min="1" max="5" value="2" />
+</div>
 
-    const pipeline = document.getElementById('pipeline');
+<button onclick="runRAG()">Run Simulation</button>
+<div class="output" id="output">Run the simulation...</div>
+</div>
 
-    steps.forEach((step, index) => {
-      const div = document.createElement('div');
-      div.className = 'step';
-      div.innerHTML = `<h3>${step.title}</h3><p>${step.desc}</p>`;
-      div.onclick = () => highlight(index);
-      pipeline.appendChild(div);
-    });
+<div class="panel">
+<h3 style="margin-bottom:12px;color:#7dd3fc">Embedding Space</h3>
+<canvas id="vectorCanvas" width="400" height="300"></canvas>
+</div>
+</div>
+</div>
 
-    function highlight(index) {
-      document.querySelectorAll('.step').forEach((s, i) => {
-        s.classList.toggle('active', i === index);
-      });
-    }
+<script>
+const steps = ['Documents','Chunking','Embeddings','Retrieval','Augmentation','Generation'];
+const pipeline = document.getElementById('pipeline');
+steps.forEach((s,i)=>{
+ const div = document.createElement('div');
+ div.className='step';
+ div.innerHTML=`<strong>${i+1}. ${s}</strong>`;
+ pipeline.appendChild(div);
+});
 
-    function fakeEmbedding(text) {
-      return text.toLowerCase().split(' ').slice(0, 4).join(' | ');
-    }
+['chunkSize','overlap','topk'].forEach(id=>{
+ document.getElementById(id).oninput=(e)=>{
+   if(id==='chunkSize') document.getElementById('chunkValue').innerText=e.target.value;
+   if(id==='overlap') document.getElementById('overlapValue').innerText=e.target.value;
+   if(id==='topk') document.getElementById('topkValue').innerText=e.target.value;
+ }
+});
 
-    function score(chunk, query) {
-      let score = 0;
-      query.toLowerCase().split(' ').forEach(word => {
-        if (chunk.toLowerCase().includes(word)) score++;
-      });
-      return score;
-    }
+function highlight(index){
+ document.querySelectorAll('.step').forEach((s,i)=>s.classList.toggle('active',i===index));
+}
 
-    function runRAG() {
-      const docs = document.getElementById('docs').value
-        .split('\n')
-        .filter(Boolean);
+function chunkText(text,size,overlap){
+ const words = text.split(' ');
+ const chunks=[];
+ for(let i=0;i<words.length;i+=(size-overlap)){
+   chunks.push(words.slice(i,i+size).join(' '));
+   if(i+size>=words.length) break;
+ }
+ return chunks;
+}
 
-      const query = document.getElementById('query').value;
+function similarity(chunk, query){
+ let score = 0;
+ query.toLowerCase().split(' ').forEach(word=>{
+   if(chunk.toLowerCase().includes(word)) score++;
+ });
+ return score + Math.random()*0.5;
+}
 
-      let output = '';
+function drawVectors(chunks, query){
+ const canvas = document.getElementById('vectorCanvas');
+ const ctx = canvas.getContext('2d');
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ 
+ const points=[];
+ chunks.forEach((c,i)=>{
+   points.push({x:50+Math.random()*300,y:40+Math.random()*220,label:'C'+(i+1)});
+ });
+ const queryPoint = {x:200,y:150,label:'Q'};
+ 
+ ctx.font='14px Arial';
+ points.forEach(p=>{
+   ctx.beginPath();
+   ctx.arc(p.x,p.y,8,0,Math.PI*2);
+   ctx.fill();
+   ctx.fillText(p.label,p.x+12,p.y+4);
+ });
+ 
+ ctx.beginPath();
+ ctx.arc(queryPoint.x,queryPoint.y,10,0,Math.PI*2);
+ ctx.fill();
+ ctx.fillText(queryPoint.label,queryPoint.x+14,queryPoint.y+4);
+}
 
-      highlight(0);
-      output += 'STEP 1 - RAW DOCUMENTS\n';
-      output += docs.join('\n') + '\n\n';
-
-      highlight(1);
-      const chunks = docs;
-      output += 'STEP 2 - CHUNKS\n';
-      output += chunks.map((c, i) => `Chunk ${i+1}: ${c}`).join('\n') + '\n\n';
-
-      highlight(2);
-      const vectors = chunks.map(c => fakeEmbedding(c));
-      output += 'STEP 3 - EMBEDDINGS\n';
-      output += vectors.map((v, i) => `Vector ${i+1}: ${v}`).join('\n') + '\n\n';
-
-      highlight(3);
-      const ranked = chunks
-        .map(c => ({ chunk: c, score: score(c, query) }))
-        .sort((a, b) => b.score - a.score);
-
-      output += 'STEP 4 - RETRIEVAL\n';
-      output += ranked.map(r => `${r.chunk} (score: ${r.score})`).join('\n') + '\n\n';
-
-      highlight(4);
-      const context = ranked.slice(0, 2).map(r => r.chunk).join(' ');
-      output += 'STEP 5 - AUGMENTED PROMPT\n';
-      output += `Query: ${query}\nContext: ${context}\n\n`;
-
-      highlight(5);
-      output += 'STEP 6 - GENERATED ANSWER\n';
-      output += `Based on retrieved context, the most relevant content for '${query}' is: ${context}`;
-
-      document.getElementById('output').innerText = output;
-    }
-  </script>
+function runRAG(){
+ const docs = document.getElementById('docs').value;
+ const query = document.getElementById('query').value;
+ const chunkSize = +document.getElementById('chunkSize').value;
+ const overlap = +document.getElementById('overlap').value;
+ const topk = +document.getElementById('topk').value;
+ 
+ let output='';
+ 
+ highlight(0);
+ output+='STEP 1 - INGESTED DOCUMENTS\nLoaded corpus.\n\n';
+ 
+ highlight(1);
+ const chunks = chunkText(docs, chunkSize, overlap);
+ output+='STEP 2 - CHUNKING\n';
+ chunks.forEach((c,i)=>output += `Chunk ${i+1}: ${c}\n\n`);
+ 
+ highlight(2);
+ output+='STEP 3 - EMBEDDINGS\nVectors generated for each chunk.\n\n';
+ drawVectors(chunks, query);
+ 
+ highlight(3);
+ const ranked = chunks.map((c,i)=>({id:i+1,text:c,score:similarity(c,query)})).sort((a,b)=>b.score-a.score);
+ output+='STEP 4 - RETRIEVAL\n';
+ ranked.forEach(r=>output += `Chunk ${r.id}: Similarity ${r.score.toFixed(2)}\n`);
+ output+='\n';
+ 
+ highlight(4);
+ const context = ranked.slice(0,topk).map(r=>r.text).join(' ');
+ output += `STEP 5 - AUGMENTED PROMPT\nQuestion: ${query}\nContext: ${context}\n\n`;
+ 
+ highlight(5);
+ output += `STEP 6 - GENERATED ANSWER\nBased on retrieved chunks, the relevant answer is:\n${context}`;
+ 
+ document.getElementById('output').innerText = output;
+}
+</script>
 </body>
 </html>
